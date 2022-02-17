@@ -17,15 +17,18 @@ class ProfileEditableWidget extends StatelessWidget {
     final color = Theme.of(context).colorScheme.primary;
 
     return Center(
-      child: Stack(
-        children: [
-          buildImage(),
-          Positioned(
-            bottom: 0,
-            right: 4,
-            child: buildEditIcon(color),
-          ),
-        ],
+      child: GestureDetector(
+        onTap: onClicked,
+        child: Stack(
+          children: [
+            buildImage(),
+            Positioned(
+              bottom: 0,
+              right: 4,
+              child: buildEditIcon(color),
+            ),
+          ],
+        ),
       ),
     );
   }

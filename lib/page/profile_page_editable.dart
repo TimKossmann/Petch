@@ -21,6 +21,7 @@ class _ProfilePageState extends State<ProfilePageEditable> {
   File? image;
 
   Future pickImage() async {
+    print("Print");
     final image = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (image == null) return;
     final imageTemporary = File(image.path);
@@ -38,7 +39,7 @@ class _ProfilePageState extends State<ProfilePageEditable> {
         children: [
           ProfileEditableWidget(
             imagePath: user.imagePath,
-            onClicked: () => pickImage(),
+            onClicked: pickImage,
           ),
           const SizedBox(height: 24),
           buildEditName(user),
