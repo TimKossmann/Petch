@@ -5,7 +5,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:petch/firebase.dart';
 import 'package:petch/src/authentication.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/services.dart';
+import 'package:petch/page/profile_page.dart';
 
+//Testkommentar
 void main() {
   runApp(
     ChangeNotifierProvider(
@@ -22,7 +25,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Profil',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -35,7 +38,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: ProfilePage(),
     );
   }
 }
