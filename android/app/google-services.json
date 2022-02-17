@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "362050500432",
+    "project_id": "petch-563c4",
+    "storage_bucket": "petch-563c4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:362050500432:android:29aee59af7e35ac40a5e55",
+        "android_client_info": {
+          "package_name": "com.pmaster.petch"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "362050500432-0561ljlsgcolvbd49laai7mkqt54hs18.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDYC-sYICdcp1J2xB0YouO-mLuWNI8bS_4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "362050500432-0561ljlsgcolvbd49laai7mkqt54hs18.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "362050500432-uk4dp6a52t6f5r133fv04d26gv23100u.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.p-master.petch"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

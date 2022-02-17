@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:petch/firebase.dart';
+import 'package:petch/src/authentication.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => ApplicationState(),
+      builder: (context, _) => MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -95,6 +103,18 @@ class _MyHomePageState extends State<MyHomePage> {
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            Consumer<ApplicationState>(
+              builder: (context, appState, _) => Authentication(
+                email: appState.email,
+                loginState: appState.loginState,
+                startLoginFlow: appState.startLoginFlow,
+                verifyEmail: appState.verifyEmail,
+                signInWithEmailAndPassword: appState.signInWithEmailAndPassword,
+                cancelRegistration: appState.cancelRegistration,
+                registerAccount: appState.registerAccount,
+                signOut: appState.signOut,
+              ),
+            ),
             const Text(
               'You have pushed the button this many times:',
             ),
