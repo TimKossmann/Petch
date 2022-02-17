@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:petch/page/profile_page.dart';
 
 //Testkommentar
 void main() {
@@ -25,7 +27,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Petch - Your personal Pet Match'),
+      home: ProfilePage(),
     );
   }
 }
