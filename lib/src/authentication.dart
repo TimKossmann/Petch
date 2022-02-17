@@ -8,6 +8,7 @@ enum ApplicationLoginState {
   register,
   password,
   loggedIn,
+  createProfile,
 }
 
 class Authentication extends StatelessWidget {
@@ -47,7 +48,9 @@ class Authentication extends StatelessWidget {
   Widget build(BuildContext context) {
     switch (loginState) {
       case ApplicationLoginState.loggedOut:
-        return Row(
+        startLoginFlow();
+        return SizedBox();
+      /*return Row(
           children: [
             Padding(
               padding: const EdgeInsets.only(left: 24, bottom: 8),
@@ -59,17 +62,17 @@ class Authentication extends StatelessWidget {
               ),
             ),
           ],
-        );
+        );*/
       case ApplicationLoginState.emailAddress:
         return EmailForm(
             callback: (email) => verifyEmail(
-                email, (e) => _showErrorDialog(context, 'Invalid email', e)));
+                email, (e) => _showErrorDialog(context, 'Ungültige Email', e)));
       case ApplicationLoginState.password:
         return PasswordForm(
           email: email!,
           login: (email, password) {
             signInWithEmailAndPassword(email, password,
-                (e) => _showErrorDialog(context, 'Failed to sign in', e));
+                (e) => _showErrorDialog(context, 'Fehler beim Einloggen', e));
           },
         );
       case ApplicationLoginState.register:
@@ -87,8 +90,8 @@ class Authentication extends StatelessWidget {
                 email,
                 displayName,
                 password,
-                (e) =>
-                    _showErrorDialog(context, 'Failed to create account', e));
+                (e) => _showErrorDialog(
+                    context, 'Der Account konnte nicht erstellt werden', e));
           },
         );
       case ApplicationLoginState.loggedIn:
@@ -100,7 +103,7 @@ class Authentication extends StatelessWidget {
                 onPressed: () {
                   signOut();
                 },
-                child: const Text('LOGOUT'),
+                child: const Text('Ausloggen'),
               ),
             ),
           ],
@@ -108,7 +111,7 @@ class Authentication extends StatelessWidget {
       default:
         return Row(
           children: const [
-            Text("Internal error, this shouldn't happen..."),
+            Text("Interner Fehler, das sollte nicht passieren..."),
           ],
         );
     }
@@ -165,7 +168,7 @@ class _EmailFormState extends State<EmailForm> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Header('Sign in with email'),
+        const Header('Mit E-Mail anmelden'),
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Form(
@@ -178,11 +181,11 @@ class _EmailFormState extends State<EmailForm> {
                   child: TextFormField(
                     controller: _controller,
                     decoration: const InputDecoration(
-                      hintText: 'Enter your email',
+                      hintText: 'E-Mail',
                     ),
                     validator: (value) {
                       if (value!.isEmpty) {
-                        return 'Enter your email address to continue';
+                        return 'Gib deine E-Mail Adresse ein';
                       }
                       return null;
                     },
@@ -200,7 +203,7 @@ class _EmailFormState extends State<EmailForm> {
                             widget.callback(_controller.text);
                           }
                         },
-                        child: const Text('NEXT'),
+                        child: const Text('Weiter'),
                       ),
                     ),
                   ],
@@ -244,7 +247,7 @@ class _RegisterFormState extends State<RegisterForm> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Header('Create account'),
+        const Header('Neuer Account'),
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Form(
@@ -257,11 +260,11 @@ class _RegisterFormState extends State<RegisterForm> {
                   child: TextFormField(
                     controller: _emailController,
                     decoration: const InputDecoration(
-                      hintText: 'Enter your email',
+                      hintText: 'E-Mail',
                     ),
                     validator: (value) {
                       if (value!.isEmpty) {
-                        return 'Enter your email address to continue';
+                        return 'Gib deine E-Mail Adresse ein';
                       }
                       return null;
                     },
@@ -272,11 +275,11 @@ class _RegisterFormState extends State<RegisterForm> {
                   child: TextFormField(
                     controller: _displayNameController,
                     decoration: const InputDecoration(
-                      hintText: 'First & last name',
+                      hintText: 'Accountname',
                     ),
                     validator: (value) {
                       if (value!.isEmpty) {
-                        return 'Enter your account name';
+                        return 'Gib deinen Accountnamen ein';
                       }
                       return null;
                     },
@@ -287,12 +290,12 @@ class _RegisterFormState extends State<RegisterForm> {
                   child: TextFormField(
                     controller: _passwordController,
                     decoration: const InputDecoration(
-                      hintText: 'Password',
+                      hintText: 'Passwort',
                     ),
                     obscureText: true,
                     validator: (value) {
                       if (value!.isEmpty) {
-                        return 'Enter your password';
+                        return 'Gib dein Passwort ein';
                       }
                       return null;
                     },
@@ -305,7 +308,7 @@ class _RegisterFormState extends State<RegisterForm> {
                     children: [
                       TextButton(
                         onPressed: widget.cancel,
-                        child: const Text('CANCEL'),
+                        child: const Text('Abbrechen'),
                       ),
                       const SizedBox(width: 16),
                       StyledButton(
@@ -318,7 +321,7 @@ class _RegisterFormState extends State<RegisterForm> {
                             );
                           }
                         },
-                        child: const Text('SAVE'),
+                        child: const Text('Speichern'),
                       ),
                       const SizedBox(width: 30),
                     ],
@@ -359,7 +362,7 @@ class _PasswordFormState extends State<PasswordForm> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Header('Sign in'),
+        const Header('Anmelden'),
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Form(
@@ -372,11 +375,11 @@ class _PasswordFormState extends State<PasswordForm> {
                   child: TextFormField(
                     controller: _emailController,
                     decoration: const InputDecoration(
-                      hintText: 'Enter your email',
+                      hintText: 'E-Mail',
                     ),
                     validator: (value) {
                       if (value!.isEmpty) {
-                        return 'Enter your email address to continue';
+                        return 'Gib deine E-Mail Adresse ein';
                       }
                       return null;
                     },
@@ -387,12 +390,12 @@ class _PasswordFormState extends State<PasswordForm> {
                   child: TextFormField(
                     controller: _passwordController,
                     decoration: const InputDecoration(
-                      hintText: 'Password',
+                      hintText: 'Passwort',
                     ),
                     obscureText: true,
                     validator: (value) {
                       if (value!.isEmpty) {
-                        return 'Enter your password';
+                        return 'Gib dein Passwort ein';
                       }
                       return null;
                     },
@@ -413,7 +416,7 @@ class _PasswordFormState extends State<PasswordForm> {
                             );
                           }
                         },
-                        child: const Text('SIGN IN'),
+                        child: const Text('Anmelden'),
                       ),
                       const SizedBox(width: 30),
                     ],
