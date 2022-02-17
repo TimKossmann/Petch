@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:petch/firebase.dart';
 import 'package:petch/model/user.dart';
 import 'package:petch/utils/user_preferences.dart';
 import 'package:petch/widget/appbar_widget.dart';
@@ -10,6 +11,7 @@ import 'package:petch/widget/numbers_widget.dart';
 import 'package:petch/widget/profile_widget.dart';
 import 'package:petch/widget/profile_editable_widget.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 class ProfilePageEditable extends StatefulWidget {
   @override
@@ -31,6 +33,7 @@ class _ProfilePageState extends State<ProfilePageEditable> {
   @override
   Widget build(BuildContext context) {
     final user = UserPreferences.myUser;
+    final provider = Provider.of<ApplicationState>(context);
 
     return Scaffold(
       appBar: buildAppBar(context),
@@ -75,6 +78,13 @@ class _ProfilePageState extends State<ProfilePageEditable> {
           ]),
           const SizedBox(height: 24),
           buildEditInterest(user),
+          ElevatedButton(
+            onPressed: () async {
+              await provider.addUser();
+              await provider.loadProfile();
+            },
+            child: const Text('Profil Anlegen'),
+          ),
         ],
       ),
     );

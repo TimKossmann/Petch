@@ -55,26 +55,7 @@ class ApplicationState extends ChangeNotifier {
 
     FirebaseAuth.instance.userChanges().listen((user) async {
       if (user != null) {
-        _loginState = ApplicationLoginState.loggedIn;
-        final CollectionReference profileConnection =
-            FirebaseFirestore.instance.collection('User');
-        //.orderBy('timestamp', descending: true)
-        final Query profile = profileConnection.where("userId",
-            isEqualTo: FirebaseAuth.instance.currentUser!.uid);
-
-        QuerySnapshot snapshot = await profile.get();
-        if (snapshot.docs.length >= 1) {
-          var data = snapshot.docs[0];
-          _profile = Profile(
-              name: data.get("name"),
-              intrests: data.get("intrests"),
-              profilePicId: data.get("profilePicId"),
-              sex: data.get("sex"),
-              userId: data.get("userId"));
-          _profilePicURL = await downloadProfilePicURL();
-        } else {
-          _loginState = ApplicationLoginState.createProfile;
-        }
+        await loadProfile();
         /*
           for (final document in snapshot.docs) {
             
@@ -109,6 +90,30 @@ class ApplicationState extends ChangeNotifier {
 
   void startLoginFlow() {
     _loginState = ApplicationLoginState.emailAddress;
+    notifyListeners();
+  }
+
+  Future<void> loadProfile() async {
+    _loginState = ApplicationLoginState.loggedIn;
+    final CollectionReference profileConnection =
+        FirebaseFirestore.instance.collection('User');
+    //.orderBy('timestamp', descending: true)
+    final Query profile = profileConnection.where("userId",
+        isEqualTo: FirebaseAuth.instance.currentUser!.uid);
+
+    QuerySnapshot snapshot = await profile.get();
+    if (snapshot.docs.length >= 1) {
+      var data = snapshot.docs[0];
+      _profile = Profile(
+          name: data.get("name"),
+          intrests: data.get("intrests"),
+          profilePicId: data.get("profilePicId"),
+          sex: data.get("sex"),
+          userId: data.get("userId"));
+      _profilePicURL = await downloadProfilePicURL();
+    } else {
+      _loginState = ApplicationLoginState.createProfile;
+    }
     notifyListeners();
   }
 
@@ -166,15 +171,15 @@ class ApplicationState extends ChangeNotifier {
   }
 
   Future<DocumentReference> addUser() {
-    if (_loginState != ApplicationLoginState.loggedIn) {
+    if (_loginState != ApplicationLoginState.createProfile) {
       throw Exception('Must be logged in');
     }
-
+    _loginState = ApplicationLoginState.loggedIn;
     return FirebaseFirestore.instance.collection('User').add(<String, dynamic>{
       'name': "Bella",
       'intrests': "Spazieren",
       'sex': "Weiblich",
-      'profile_pic_id': "tester12345",
+      'profilePicId': "tester12345",
       'userId': FirebaseAuth.instance.currentUser!.uid,
     });
   }
@@ -193,9 +198,14 @@ class ApplicationState extends ChangeNotifier {
 
   Future<String> downloadProfilePicURL() async {
     String fileName = FirebaseAuth.instance.currentUser!.uid;
-    String downloadURL = await firebase_storage.FirebaseStorage.instance
-        .ref('profilePics/$fileName.png')
-        .getDownloadURL();
+    String downloadURL = "";
+    try {
+      String downloadURL = await firebase_storage.FirebaseStorage.instance
+          .ref('profilePics/$fileName.png')
+          .getDownloadURL();
+    } catch (e) {
+      print("NO PROFILE PIC");
+    }
     return downloadURL;
     // Within your widgets:
     // Image.network(downloadURL);

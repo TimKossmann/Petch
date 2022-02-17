@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:petch/firebase.dart';
+import 'package:petch/page/profile_page_editable.dart';
 import 'package:petch/src/authentication.dart';
 import 'package:petch/widget/profile_widget.dart';
 import 'package:provider/provider.dart';
@@ -59,7 +60,7 @@ class MyHomePage extends StatelessWidget {
               ),
             )
           : provider.loginState == ApplicationLoginState.createProfile
-              ? ProfileWidget()
+              ? ProfilePageEditable()
               : Center(
                   // Center is a layout widget. It takes a single child and positions it
                   // in the middle of the parent.
@@ -83,7 +84,9 @@ class MyHomePage extends StatelessWidget {
                       Text(
                         'Hallo ' + provider.profile!.name.toString(),
                       ),
-                      Image.network(provider.profilePicURL!),
+                      provider.profilePicURL! != ""
+                          ? Image.network(provider.profilePicURL!)
+                          : SizedBox(),
                       ElevatedButton(
                         onPressed: () {
                           provider.signOut();
