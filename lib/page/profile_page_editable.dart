@@ -19,16 +19,7 @@ class ProfilePageEditable extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePageEditable> {
-  String dropdownValue = 'male';
-  File? image;
-
-  Future pickImage() async {
-    print("Print");
-    final image = await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (image == null) return;
-    final imageTemporary = File(image.path);
-    this.image = imageTemporary;
-  }
+  String dropdownValue = 'Männlich';
 
   @override
   Widget build(BuildContext context) {
@@ -36,16 +27,12 @@ class _ProfilePageState extends State<ProfilePageEditable> {
     final provider = Provider.of<ApplicationState>(context);
 
     return Scaffold(
-      appBar: buildAppBar(context),
       body: ListView(
         physics: BouncingScrollPhysics(),
         children: [
-          ProfileEditableWidget(
-            imagePath: user.imagePath,
-            onClicked: pickImage,
-          ),
+          ProfileEditableWidget(),
           const SizedBox(height: 24),
-          buildEditName(user),
+          buildEditName(provider.profile!),
           const SizedBox(height: 24),
           Row(children: [
             Container(
@@ -63,11 +50,14 @@ class _ProfilePageState extends State<ProfilePageEditable> {
                 color: Colors.grey,
               ),
               onChanged: (String? newValue) {
+                if (newValue != null) {
+                  provider.profile!.gender = newValue;
+                }
                 setState(() {
                   dropdownValue = newValue!;
                 });
               },
-              items: <String>['male', 'female']
+              items: <String>['Männlich', 'Weiblich']
                   .map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
@@ -77,9 +67,11 @@ class _ProfilePageState extends State<ProfilePageEditable> {
             ),
           ]),
           const SizedBox(height: 24),
-          buildEditInterest(user),
+          buildEditInterest(provider.profile!),
           ElevatedButton(
             onPressed: () async {
+              print("#################");
+              print(provider.profile!.toString());
               await provider.addUser();
               await provider.loadProfile();
             },
@@ -90,26 +82,32 @@ class _ProfilePageState extends State<ProfilePageEditable> {
     );
   }
 
-  Widget buildEditName(User user) => Column(
+  Widget buildEditName(Profile user) => Column(
         children: [
           TextFormField(
               decoration: const InputDecoration(
                 icon: Icon(Icons.person),
-                labelText: 'Edit Name',
+                labelText: 'Namen eingeben',
               ),
+              onChanged: (value) {
+                user.name = value;
+              },
               initialValue: user.name,
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
         ],
       );
 
-  Widget buildEditInterest(User user) => Column(
+  Widget buildEditInterest(Profile user) => Column(
         children: [
           TextFormField(
               decoration: const InputDecoration(
                 icon: Icon(Icons.donut_large),
-                labelText: 'Edit Interests',
+                labelText: 'Beschreibe deine Interessen',
               ),
-              initialValue: user.about,
+              onChanged: (value) {
+                user.intrests = value;
+              },
+              initialValue: user.intrests,
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
         ],
       );

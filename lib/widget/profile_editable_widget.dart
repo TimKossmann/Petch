@@ -1,24 +1,37 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:petch/firebase.dart';
+import 'package:provider/provider.dart';
 
-class ProfileEditableWidget extends StatelessWidget {
-  final String imagePath;
-  final VoidCallback onClicked;
+class ProfileEditableWidget extends StatefulWidget {
+  ProfileEditableWidget({Key? key}) : super(key: key);
 
-  const ProfileEditableWidget({
-    Key? key,
-    required this.imagePath,
-    required this.onClicked,
-  }) : super(key: key);
+  @override
+  State<ProfileEditableWidget> createState() => _ProfileEditableWidgetState();
+}
+
+class _ProfileEditableWidgetState extends State<ProfileEditableWidget> {
+  File? image;
+
+  Future pickImage(ApplicationState provider) async {
+    final image = await ImagePicker().pickImage(source: ImageSource.camera);
+    if (image == null) return;
+    provider.image = File(image.path);
+    setState(() {
+      this.image = File(image.path);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final color = Theme.of(context).colorScheme.primary;
+    final provider = Provider.of<ApplicationState>(context);
 
     return Center(
       child: GestureDetector(
-        onTap: onClicked,
+        onTap: () => pickImage(provider),
         child: Stack(
           children: [
             buildImage(),
@@ -34,19 +47,18 @@ class ProfileEditableWidget extends StatelessWidget {
   }
 
   Widget buildImage() {
-    final image = NetworkImage(imagePath);
-
-    return ClipOval(
-      child: Material(
+    return Material(
         color: Colors.transparent,
-        child: Ink.image(
-          image: image,
-          fit: BoxFit.cover,
-          width: 128,
-          height: 128,
-        ),
-      ),
-    );
+        child: image != null
+            ? SizedBox(
+                child: Image.file(image!),
+                width: 125,
+                height: 125,
+              )
+            : const SizedBox(
+                width: 125,
+                height: 125,
+              ));
   }
 
   Widget buildEditIcon(Color color) => buildCircle(
@@ -56,7 +68,7 @@ class ProfileEditableWidget extends StatelessWidget {
           color: color,
           all: 8,
           child: Icon(
-            Icons.edit,
+            image != null ? Icons.edit : Icons.camera_alt,
             color: Colors.white,
             size: 20,
           ),

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:petch/firebase.dart';
 import 'package:petch/page/profile_page_editable.dart';
+import 'package:petch/profile_overview.dart';
 import 'package:petch/src/authentication.dart';
 import 'package:petch/widget/profile_widget.dart';
 import 'package:provider/provider.dart';
@@ -61,7 +62,8 @@ class MyHomePage extends StatelessWidget {
             )
           : provider.loginState == ApplicationLoginState.createProfile
               ? ProfilePageEditable()
-              : Center(
+              : ProfilePage(),
+      /*Center(
                   // Center is a layout widget. It takes a single child and positions it
                   // in the middle of the parent.
                   child: Column(
@@ -95,7 +97,7 @@ class MyHomePage extends StatelessWidget {
                       ),
                     ],
                   ),
-                ),
+                ),*/
       drawer: Drawer(
         // Add a ListView to the drawer. This ensures the user can scroll
         // through the options in the drawer if there isn't enough vertical
@@ -116,18 +118,20 @@ class MyHomePage extends StatelessWidget {
                 // Update the state of the app
                 // ...
                 // Then close the drawer
-                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProfileList()),
+                );
               },
             ),
-            ListTile(
-              title: const Text('Item 2'),
-              onTap: () {
-                // Update the state of the app
-                // ...
-                // Then close the drawer
-                Navigator.pop(context);
-              },
-            ),
+            provider.loginState == ApplicationLoginState.loggedIn
+                ? ListTile(
+                    title: const Text('Ausloggen'),
+                    onTap: () {
+                      provider.signOut();
+                    },
+                  )
+                : SizedBox(),
           ],
         ),
       ),
