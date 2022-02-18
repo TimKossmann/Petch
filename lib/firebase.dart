@@ -338,6 +338,9 @@ class ApplicationState extends ChangeNotifier {
   }
 
   void signOut() {
+    _allProfiles = [];
+    _matches = [];
+
     FirebaseAuth.instance.signOut();
   }
 }
