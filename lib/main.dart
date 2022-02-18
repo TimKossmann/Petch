@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:petch/firebase.dart';
+import 'package:petch/match_list.dart';
 import 'package:petch/page/profile_page_editable.dart';
 import 'package:petch/profile_overview.dart';
 import 'package:petch/src/authentication.dart';
@@ -113,14 +114,27 @@ class MyHomePage extends StatelessWidget {
               child: Text('Drawer Header'),
             ),
             ListTile(
-              title: const Text('Item 1'),
+              title: const Text('Alle Nutzer'),
+              onTap: () {
+                // Update the state of the app
+                // ...
+                // Then close the drawer
+                provider.loadProfile();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProfileList()),
+                );
+              },
+            ),
+            ListTile(
+              title: const Text('Petches'),
               onTap: () {
                 // Update the state of the app
                 // ...
                 // Then close the drawer
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => ProfileList()),
+                  MaterialPageRoute(builder: (context) => MatchList()),
                 );
               },
             ),

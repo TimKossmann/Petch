@@ -3,25 +3,25 @@ import 'package:petch/firebase.dart';
 import 'package:petch/widget/profile_widget.dart';
 import 'package:provider/provider.dart';
 
-class ProfileList extends StatefulWidget {
-  ProfileList({Key? key}) : super(key: key);
+class MatchList extends StatefulWidget {
+  MatchList({Key? key}) : super(key: key);
 
   @override
-  State<ProfileList> createState() => _ProfileListState();
+  State<MatchList> createState() => _MatchListState();
 }
 
-class _ProfileListState extends State<ProfileList> {
+class _MatchListState extends State<MatchList> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<ApplicationState>(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("All Profile"),
+        title: const Text("It's a Petch!"),
       ),
       body: ListView(
         children: [
-          for (var profile in provider.allProfiles)
+          for (var profile in provider.matches)
             Container(
               margin: const EdgeInsets.only(left: 30, right: 30),
               height: 125,
@@ -37,7 +37,9 @@ class _ProfileListState extends State<ProfileList> {
                           child: Material(
                             color: Colors.transparent,
                             child: Ink.image(
-                              image: NetworkImage(provider.profilePicURL!),
+                              image: NetworkImage(provider
+                                  .userPics[profile.userId.toString()]
+                                  .toString()),
                               fit: BoxFit.cover,
                               width: 75,
                               height: 75,

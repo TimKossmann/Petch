@@ -43,6 +43,12 @@ class ApplicationState extends ChangeNotifier {
   File? image;
   List<Profile> _allProfiles = [];
   List<Profile> get allProfiles => _allProfiles;
+  List<String> _requested = [];
+  List<String> get requested => _requested;
+  List<Profile> _matches = [];
+  List<Profile> get matches => _matches;
+  Map _userPics = {};
+  Map get userPics => _userPics;
 
   ApplicationState() {
     init();
@@ -56,6 +62,7 @@ class ApplicationState extends ChangeNotifier {
     FirebaseAuth.instance.userChanges().listen((user) async {
       if (user != null) {
         await loadProfile();
+
         /*
           for (final document in snapshot.docs) {
             
@@ -99,20 +106,27 @@ class ApplicationState extends ChangeNotifier {
         FirebaseFirestore.instance.collection('User');
     //.orderBy('timestamp', descending: true)
 
-    profileConnection.get().then((QuerySnapshot snapshot) {
-      snapshot.docs.forEach((doc) {
-        try {
-          _allProfiles.add(Profile(
-              name: doc["name"],
-              intrests: doc["intrests"],
-              gender: doc["gender"],
-              userId: doc["userId"]));
-        } catch (e) {
-          print("NO USERID");
-        }
+    if (_allProfiles.isEmpty) {
+      _allProfiles = [];
+
+      profileConnection.get().then((QuerySnapshot snapshot) async {
+        snapshot.docs.forEach((doc) async {
+          try {
+            if (doc["userId"] != FirebaseAuth.instance.currentUser!.uid) {
+              _allProfiles.add(Profile(
+                  name: doc["name"],
+                  intrests: doc["intrests"],
+                  gender: doc["gender"],
+                  userId: doc["userId"]));
+            }
+          } catch (e) {
+            print("NO USERID");
+          }
+        });
+
+        print(_allProfiles.length);
       });
-      print(_allProfiles.length);
-    });
+    }
 
     Query profileQuery = profileConnection.where("userId",
         isEqualTo: FirebaseAuth.instance.currentUser!.uid);
@@ -129,6 +143,8 @@ class ApplicationState extends ChangeNotifier {
       _loginState = ApplicationLoginState.createProfile;
       profile = Profile(name: "", intrests: "", gender: "Männlich", userId: "");
     }
+    await loadRequested();
+    await loadMatches();
     notifyListeners();
   }
 
@@ -217,6 +233,93 @@ class ApplicationState extends ChangeNotifier {
     } catch (e) {
       // e.g, e.code == 'canceled'
     }
+  }
+
+  Future<void> addRequest(String requestedUserId) async {
+    if (_loginState != ApplicationLoginState.loggedIn) {
+      throw Exception('Man muss angemeldet sein');
+    }
+    if (profile == null) {
+      return;
+    }
+
+    await FirebaseFirestore.instance
+        .collection('Request')
+        .add(<String, dynamic>{
+      'requested': requestedUserId,
+      'userId': FirebaseAuth.instance.currentUser!.uid,
+    });
+    await loadRequested();
+    await loadMatches();
+    notifyListeners();
+  }
+
+  Future<void> loadRequested() async {
+    final CollectionReference profileConnection =
+        FirebaseFirestore.instance.collection('Request');
+    //.orderBy('timestamp', descending: true)
+    _requested = [];
+    await profileConnection.get().then((QuerySnapshot snapshot) {
+      snapshot.docs.forEach((doc) {
+        try {
+          if (doc["userId"] == FirebaseAuth.instance.currentUser!.uid) {
+            _requested.add(doc["requested"]);
+          }
+        } catch (e) {
+          print("NO USERID");
+        }
+      });
+    });
+    print(_requested);
+    notifyListeners();
+  }
+
+  Future<void> loadMatches() async {
+    print("##########");
+    print("Load Matches");
+    final CollectionReference profileConnection =
+        FirebaseFirestore.instance.collection('Request');
+    //.orderBy('timestamp', descending: true)
+    Query profileQuery = profileConnection.where("requested",
+        isEqualTo: FirebaseAuth.instance.currentUser!.uid);
+    QuerySnapshot snapshot = await profileQuery.get();
+    for (var doc in snapshot.docs) {
+      if (_requested.contains(doc.get("userId"))) {
+        await loadUserProfile(doc.get("userId"));
+        _userPics[doc.get("userId")] =
+            await getProfilePicForUser(doc.get("userId"));
+      }
+    }
+    notifyListeners();
+  }
+
+  Future<void> loadUserProfile(String userId) async {
+    final CollectionReference profileConnection =
+        FirebaseFirestore.instance.collection('User');
+    Query profileQuery = profileConnection.where("userId", isEqualTo: userId);
+    QuerySnapshot snapshot = await profileQuery.get();
+    if (snapshot.docs.length >= 1) {
+      var data = snapshot.docs[0];
+      _matches.add(Profile(
+          name: data.get("name"),
+          intrests: data.get("intrests"),
+          gender: data.get("gender"),
+          userId: data.get("userId")));
+    }
+  }
+
+  Future<String> getProfilePicForUser(String userId) async {
+    String downloadURL = "";
+    try {
+      downloadURL = await firebase_storage.FirebaseStorage.instance
+          .ref('profilePics/$userId.png')
+          .getDownloadURL();
+    } catch (e) {
+      print("NO PROFILE PIC");
+    }
+    return downloadURL;
+    // Within your widgets:
+    // Image.network(downloadURL);
   }
 
   Future<String> downloadProfilePicURL() async {
